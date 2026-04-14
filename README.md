@@ -69,7 +69,7 @@ The following tools are **not** included and must be installed separately by the
 
 ### Download precompiled binary
 
- You can also run it directly:
+You can also run it directly:
 
 ```bash
 ./PanSVScope --help
@@ -77,30 +77,42 @@ The following tools are **not** included and must be installed separately by the
 
 ### Conda environment setup
 
-A recommended conda environment for the main pipeline (excluding Manta/Smoove which require Python 2.7) is:
+We strongly recommend using [**mamba**](https://github.com/mamba-org/mamba) instead of `conda` for faster and more reliable dependency resolution. If you do not have mamba installed, you can install it via conda first:
 
 ```bash
-conda create -n PanSVScope python=3.11 -y
-conda activate PanSVScope
-conda install bioconda::wham bioconda::bedtools bioconda::bcftools bioconda::samtools bioconda::htslib bioconda::vcflib
+conda install -n base -c conda-forge mamba
 ```
 
-For Manta and Smoove, create a separate environment with Python 2.7:
+Then create and configure the required environments as follows.
+
+#### Main environment (Python 3.11) – for most external tools
 
 ```bash
-conda create -n SV_check python=2.7 -y
-conda activate SV_check
-conda install bioconda::manta bioconda::smoove
+mamba create -n PanSVScope python=3.11 -y
+mamba activate PanSVScope
+mamba install bioconda::wham bioconda::bedtools bioconda::bcftools bioconda::samtools bioconda::htslib bioconda::vcflib
 ```
 
-Dysgu also works with Python 3.11 but **must be installed in its own isolated environment** to avoid conflicts with other packages:
+#### Environment for Manta and Smoove (Python 2.7)
 
 ```bash
-conda create -n dysgu-env python=3.11 -y
-conda activate dysgu-env
-conda install bioconda::dysgu
-conda install --force-reinstall numpy=1.26.4 pandas=1.5.3 -y
+mamba create -n SV_check python=2.7 -y
+mamba activate SV_check
+mamba install bioconda::manta bioconda::smoove
 ```
+
+#### Isolated environment for Dysgu (Python 3.11)
+
+Dysgu must be installed in its own isolated environment to avoid conflicts with other packages:
+
+```bash
+mamba create -n dysgu-env python=3.11 -y
+mamba activate dysgu-env
+mamba install bioconda::dysgu
+mamba install --force-reinstall numpy=1.26.4 pandas=1.5.3 -y
+```
+
+> **Note:** If you prefer to use `conda` instead of `mamba`, simply replace `mamba` with `conda` in the commands above. However, `mamba` is significantly faster and less prone to dependency conflicts.
 
 ## Quick Start Examples
 
@@ -396,7 +408,7 @@ Output: `{workdir}/SVgeno.vcf.gz` – a VCF with genotype columns for all sample
    Manta and Smoove require **Python 2.7** – use a separate conda environment for them (e.g., `SV_check`). Dysgu requires its **own isolated environment** (e.g., `dysgu-env`) due to dependency conflicts with other packages.
 
 3. **BAM indexing**  
-   Input BAM files for `svcall` must be coordinate‑sorted and indexed (`.bam.bai`). The `mapr` module produces such BAMs.
+   Input BAM files for `svcall` must be coordinate‑sorted and indexed (`.bam.bai`). The `mapr` module produces such BAMs. If you have your own generated bam, as long as it meets the requirements, it is acceptable.
 
 4. **Reference genome indexing**  
    The reference FASTA must be indexed with `bwa index` (for `mapr`), `samtools faidx` (for many tools), and for some SV callers additional indexes may be required.
@@ -428,15 +440,33 @@ Output: `{workdir}/SVgeno.vcf.gz` – a VCF with genotype columns for all sample
 11. **Optional external tools**  
     Consistent with the above, you only need to install and provide paths for the tools you actually intend to use. For example, if you run `svcall` with only Delly and WHAM, you do not need to install Manta, Smoove, or other callers. Likewise, if `svgeno` is run with only PanGenie, you do not need BayesTyper, GraphTyper2, or their dependencies. This greatly simplifies environment setup.
 
+12. **Pre‑processing raw WGS FASTQ data**  
+    We strongly recommend running **fastp** (or a similar quality control tool) on your raw FASTQ files **before** feeding them into the PanSVScope pipeline. Quality trimming, adapter removal, and read filtering significantly improve mapping accuracy and SV calling sensitivity.
+
+13. **Pre‑built `--known-sv` datasets**  
+    For several domestic animals (e.g., cattle, pig, chicken) and human, we provide ready‑to‑use known SV databases that can be directly supplied to the `--known-sv` parameter of `pangra`. These datasets have been curated from public resources (e.g., dbVar, gnomAD‑SV) and are compatible with PanSVScope.  
+    ➤ **Download links:** [See our data repository – XXXXA]  
+
+14. **Building and using `--pgenome` files**  
+    If you wish to construct a custom pan‑genome VCF for your own set of genomes, we recommend using **cactus-pangenome** with the `--vcf` flag to produce a `pangenome.vcf.gz` file
+    The resulting `pangenome.vcf.gz` can be used directly with `pangra --pgenome`.  
+    Additionally, we provide pre‑built pan‑genome VCF files for several species (human, cattle, pig, etc.) to save you computation time.  
+    ➤ **Download links:** [See our data repository – XXXXB]  
+
+15. **Quick SV genotyping for a few samples**  
+    If you have only a handful of samples and want to quickly genotype them without building a full pan‑genome graph from scratch, you can use a streamlined workflow:
+    - **Step 1:** Run `pangra` with **only** `--known-sv` (and optionally `--pgenome`, but at least `--known-sv`). This will create a merged VCF and indexes using the known SV database.
+    - **Step 2:** Run `svgeno` with **only** PanGenie (`--enable-pangenie`) using the indexes produced in Step 1.  
+    This two‑step approach is fast and does not require WGS‑based SV calls (i.e., you can skip `svcall`).
+
 ## Citation
 
 If you use PanSVScope in a publication, please cite:
 
->  2026.
+> PanSVScope development team, 2026.
 
 ## License
 
 MIT License
 
 Copyright (c) 2026 Institute of Genomics
-

@@ -65,7 +65,7 @@ The following tools are **not** included and must be installed separately by the
 | bcftools | 1.23.1 | Install via conda (Python 3.11 environment) |
 | Manta | 1.6.0 | Requires Python 2.7 environment (separate conda env) |
 | smoove | 0.2.8 | Requires Python 2.7 environment (separate conda env) |
-| dysgu | 1.40 / 1.70 / 1.87 | Requires its own isolated conda environment |
+| dysgu | 1.40 / 1.70 / 1.87 | Requires its own isolated conda environment (see below) |
 
 ### Download precompiled binary
 
@@ -103,13 +103,50 @@ mamba install bioconda::manta bioconda::smoove
 
 #### Isolated environment for Dysgu (Python 3.11)
 
-Dysgu must be installed in its own isolated environment to avoid conflicts with other packages:
+Dysgu must be installed in its own isolated environment to avoid conflicts with other packages. Two installation methods are provided:
+
+**Option 1 – Install via bioconda (simple):**
 
 ```bash
 mamba create -n dysgu-env python=3.11 -y
 mamba activate dysgu-env
 mamba install bioconda::dysgu
 mamba install --force-reinstall numpy=1.26.4 pandas=1.5.3 -y
+```
+
+**Option 2 – Install from source (if the bioconda package fails):**
+
+```bash
+# Create the environment with build dependencies
+mamba create -n dysgu-env \
+  python=3.11 \
+  "pip>=23.1" \
+  "cython>=3" \
+  "meson-python>=0.14" \
+  compilers \
+  numpy \
+  pandas \
+  scipy \
+  scikit-learn \
+  networkx \
+  sortedcontainers \
+  "click>=8.0" \
+  "pysam=0.23.3" \
+  "superintervals>=0.3.0" \
+  lightgbm \
+  "htslib=1.23" \
+  -c conda-forge -c bioconda --strict-channel-priority -y
+
+# Activate the environment
+mamba activate dysgu-env
+
+# Clone the Dysgu source code (version 1.8.8)
+git clone --branch v1.8.8 --depth 1 https://github.com/kcleal/dysgu.git
+cd dysgu
+
+# Install Dysgu using pip (linking to the htslib from the conda environment)
+python -m pip install . --no-build-isolation \
+  -Csetup-args="-Dhtslib_prefix=$CONDA_PREFIX"
 ```
 
 > **Note:** If you prefer to use `conda` instead of `mamba`, simply replace `mamba` with `conda` in the commands above. However, `mamba` is significantly faster and less prone to dependency conflicts.
@@ -448,7 +485,7 @@ Output: `{workdir}/SVgeno.vcf.gz` – a VCF with genotype columns for all sample
     ➤ **Download links:** [See our data repository – XXXXA]  
 
 14. **Building and using `--pgenome` files**  
-    If you wish to construct a custom pan‑genome VCF for your own set of genomes, we recommend using **cactus-pangenome** with the `--vcf` flag to produce a `pangenome.vcf.gz` file
+    If you wish to construct a custom pan‑genome VCF for your own set of genomes, we recommend using **cactus-pangenome** with the `--vcf` flag to produce a `pangenome.vcf.gz` file.  
     The resulting `pangenome.vcf.gz` can be used directly with `pangra --pgenome`.  
     Additionally, we provide pre‑built pan‑genome VCF files for several species (human, cattle, pig, etc.) to save you computation time.  
     ➤ **Download links:** [See our data repository – XXXXB]  

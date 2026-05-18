@@ -43,6 +43,7 @@ The following tools are packaged together with PanSVScope – no separate instal
 | Graphvcf | 1.2.2 (bundled) |
 | Vg | 1.72.0 (bundled) |
 | PanGenie | 4.2.1 (bundled) |
+| PanGenie-index | 4.2.1 (bundled) |
 | Parallel | 20170422 (bundled) |
 | graphtyper | 2.7.7 (bundled) |
 | bayesTyper | 1.5 (bundled) |

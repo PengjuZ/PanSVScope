@@ -501,7 +501,7 @@ Output: `{workdir}/SVgeno.vcf.gz` – a VCF with genotype columns for all sample
 
 If you use PanSVScope in a publication, please cite:
 
-> PanSVScope: Comprehensive Structural Variant Analysis Toolkit. Hainan Institute, Zhejiang University, 2026.
+> ##############################, 2026.
 
 ## License
 

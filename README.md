@@ -43,7 +43,6 @@ The following tools are packaged together with PanSVScope – no separate instal
 | Graphvcf | 1.2.2 (bundled) |
 | Vg | 1.72.0 (bundled) |
 | PanGenie | 4.2.1 (bundled) |
-| PanGenie-index | 4.2.1 (bundled) |
 | Parallel | 20170422 (bundled) |
 | graphtyper | 2.7.7 (bundled) |
 | bayesTyper | 1.5 (bundled) |
@@ -283,22 +282,46 @@ Output: `./svmerge_out/SVgeno.vcf.gz` – a multi‑sample VCF with genotype col
 
 ### `PanSVScope mapr`
 
-Align paired‑end reads, sort, mark duplicates and index.
+Align paired‑end reads, sort, mark duplicates and index. Supports two alignment tools: **BWA‑MEM** (classic) and **minibwa** (faster). If both `--BWA` and `--Minibwa` are provided, **minibwa** takes precedence.
 
 | Option | Description |
 |--------|-------------|
 | `--ID` | Sample identifier (used in read groups and output names) (required) |
-| `--GENOME` | Reference genome FASTA (must be indexed with `bwa index`) (required) |
+| `--GENOME` | Reference genome FASTA file (for BWA) or index prefix (for minibwa) (required) |
 | `--R1` | Forward FASTQ file (may be gzipped) (required) |
 | `--R2` | Reverse FASTQ file (required) |
 | `--OUTDIR` | Output directory for final BAM and index (required) |
 | `--TMPDIR` | Temporary directory for sorting (required) |
 | `--THREADS` | Number of CPU threads (required) |
-| `--BWA` | Path to BWA‑MEM executable (required) |
+| `--BWA` | Path to BWA‑MEM executable (optional, but at least one aligner is required) |
+| `--Minibwa` | Path to minibwa executable (optional, takes precedence if both provided) |
 | `--SAMBAMBA` | Path to Sambamba executable (required) |
 | `-h, --help` | Show help message |
 
-**Pipeline steps:** BWA‑MEM alignment → SAM to BAM conversion → sorting → duplicate marking → indexing → cleanup of intermediate files.
+**Pipeline steps:** Alignment (BWA or minibwa) → SAM to BAM conversion → sorting → duplicate marking → indexing → cleanup of intermediate files.
+
+**Indexing your reference:**
+- For **BWA**: `bwa index -p <reference.fa> <reference.fa>` (the `-p` option sets the prefix; if omitted, the output files use the reference name). The `--GENOME` must point to the same prefix file (or the reference file if no prefix was used).
+- For **minibwa**: `minibwa index <reference.fa> <reference.fa>` (the second argument is the output prefix; if omitted, it uses the input name). The `--GENOME` must be the prefix you used.
+
+Example commands:
+```bash
+# BWA index (outputs hg38.fa.amb, hg38.fa.ann, ...)
+bwa index -p hg38.fa hg38.fa
+
+# minibwa index (outputs hg38.fa.amb, hg38.fa.ann, ...)
+minibwa index hg38.fa hg38.fa
+```
+
+**Examples:**
+- Using BWA:
+```bash
+PanSVScope mapr --ID=sample01 --GENOME=hg38.fa --R1=sample01_R1.fq.gz --R2=sample01_R2.fq.gz --OUTDIR=./bams --TMPDIR=./tmp --THREADS=32 --BWA=/usr/bin/bwa --SAMBAMBA=/usr/bin/sambamba
+```
+- Using minibwa (the `--GENOME` is the index prefix):
+```bash
+PanSVScope mapr --ID=sample01 --GENOME=hg38.fa --R1=sample01_R1.fq.gz --R2=sample01_R2.fq.gz --OUTDIR=./bams --TMPDIR=./tmp --THREADS=32 --Minibwa=/usr/bin/minibwa --SAMBAMBA=/usr/bin/sambamba
+```
 
 ### `PanSVScope svcall`
 
@@ -501,10 +524,10 @@ Output: `{workdir}/SVgeno.vcf.gz` – a VCF with genotype columns for all sample
 
 If you use PanSVScope in a publication, please cite:
 
-> ##############################, 2026.
+> PanSVScope development team, 2026.
 
 ## License
 
 MIT License
 
-Copyright (c) 2026 
+Copyright (c) 2026 Institute of Genomics

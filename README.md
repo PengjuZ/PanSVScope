@@ -309,7 +309,7 @@ Example commands:
 # BWA index (outputs hg38.fa.amb, hg38.fa.ann, ...)
 bwa index -p hg38.fa hg38.fa
 
-# minibwa index (outputs hg38.fa.amb, hg38.fa.ann, ...)
+# minibwa index (outputs hg38.fa.l2b, hg38.fa.mbw, ...)
 minibwa index hg38.fa hg38.fa
 ```
 

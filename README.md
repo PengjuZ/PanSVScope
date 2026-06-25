@@ -258,12 +258,12 @@ Outputs: `./svgeno_out/sample01/sample01.vcf.gz` (merged genotypes from all enab
 
 ### 5. Merge multiple sample VCFs into a population matrix (svmer)
 
-Create `vcf_list.txt` with paths to each sample’s final VCF (from svgeno):
+Create `vcf_list.txt` with paths to each sample’s final high-confidence VCF (h.sample01.vcf.gz from svgeno):
 
 ```
-./svgeno_out/sample01/sample01.vcf.gz
-./svgeno_out/sample02/sample02.vcf.gz
-./svgeno_out/sample03/sample03.vcf.gz
+./svgeno_out/sample01/h.sample01.vcf.gz
+./svgeno_out/sample02/h.sample02.vcf.gz
+./svgeno_out/sample03/h.sample03.vcf.gz
 ```
 
 Then run:

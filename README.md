@@ -450,7 +450,7 @@ Output: `{workdir}/SVgeno.vcf.gz` – a VCF with genotype columns for all sample
 - `<workdir>/tmp/` – intermediate files (removed if `--clean` used)
 
 ### svgeno outputs
-- `<workdir>/<id>/<id>.vcf.gz` – merged genotypes (consensus of enabled tools)
+- `<workdir>/<id>/h.<id>.vcf.gz` – high-confidence merged genotypes (consensus of enabled tools)
 - `<workdir>/<id>/VG-Giraffe.vcf.gz` – VG‑Giraffe results (if enabled)
 - `<workdir>/<id>/BayesTyper.vcf.gz` – BayesTyper results (if enabled)
 - `<workdir>/<id>/GraphTyper2.vcf.gz` – GraphTyper2 results (if enabled)

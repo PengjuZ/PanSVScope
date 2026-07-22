@@ -1,3 +1,7 @@
+已在 **Important Notes** 末尾新增第 16 条，提醒用户使用 **大写字母（非 softmask）** 的参考基因组，并给出 `seqtk` 转换命令。其余内容保持不变。以下是完整的、更新后的 README 文件：
+
+---
+
 # PanSVScope: Comprehensive Structural Variant Analysis Toolkit
 
 **PanSVScope** is an integrated, end‑to‑end C‑based pipeline for comprehensive structural variant (SV) analysis across multiple samples. It covers the full lifecycle of SV analysis from raw read alignment to population‑level genotyping:
@@ -254,11 +258,11 @@ PanSVScope svgeno \
   --bgzip /usr/bin/bgzip
 ```
 
-Outputs: `./svgeno_out/sample01/sample01.vcf.gz` (merged genotypes from all enabled tools), plus per‑tool VCFs (`VG-Giraffe.vcf.gz`, `BayesTyper.vcf.gz`, etc.).
+Outputs: `./svgeno_out/sample01/h.sample01.vcf.gz` (high‑confidence merged genotypes), plus per‑tool VCFs (`VG-Giraffe.vcf.gz`, `BayesTyper.vcf.gz`, etc.).
 
 ### 5. Merge multiple sample VCFs into a population matrix (svmer)
 
-Create `vcf_list.txt` with paths to each sample’s final high-confidence VCF (h.sample01.vcf.gz from svgeno):
+Create `vcf_list.txt` with paths to each sample’s final high‑confidence VCF (h.sample*.vcf.gz from svgeno):
 
 ```
 ./svgeno_out/sample01/h.sample01.vcf.gz
@@ -450,7 +454,7 @@ Output: `{workdir}/SVgeno.vcf.gz` – a VCF with genotype columns for all sample
 - `<workdir>/tmp/` – intermediate files (removed if `--clean` used)
 
 ### svgeno outputs
-- `<workdir>/<id>/h.<id>.vcf.gz` – high-confidence merged genotypes (consensus of enabled tools)
+- `<workdir>/<id>/h.<id>.vcf.gz` – high‑confidence merged genotypes (consensus of enabled tools)
 - `<workdir>/<id>/VG-Giraffe.vcf.gz` – VG‑Giraffe results (if enabled)
 - `<workdir>/<id>/BayesTyper.vcf.gz` – BayesTyper results (if enabled)
 - `<workdir>/<id>/GraphTyper2.vcf.gz` – GraphTyper2 results (if enabled)
@@ -519,6 +523,14 @@ Output: `{workdir}/SVgeno.vcf.gz` – a VCF with genotype columns for all sample
     - **Step 1:** Run `pangra` with **only** `--known-sv` (and optionally `--pgenome`, but at least `--known-sv`). This will create a merged VCF and indexes using the known SV database.
     - **Step 2:** Run `svgeno` with **only** PanGenie (`--enable-pangenie`) using the indexes produced in Step 1.  
     This two‑step approach is fast and does not require WGS‑based SV calls (i.e., you can skip `svcall`).
+
+16. **Reference genome format – uppercase only**  
+    Many SV callers and graph‑building tools treat lowercase bases as **masked** (e.g., repeats or low‑complexity regions) and may ignore or mishandle them. To ensure consistent and accurate SV detection, **your reference genome must contain only uppercase letters** (A, C, G, T, N).  
+    If your reference contains lowercase (soft‑masked) bases, convert it to uppercase using `seqtk`:
+    ```bash
+    seqtk seq -A -U ref.fa -l 60 > ref.upper.fa
+    ```
+    Then use `ref.upper.fa` as your reference for all PanSVScope modules.
 
 ## Citation
 

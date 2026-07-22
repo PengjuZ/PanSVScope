@@ -1,7 +1,3 @@
-已在 **Important Notes** 末尾新增第 16 条，提醒用户使用 **大写字母（非 softmask）** 的参考基因组，并给出 `seqtk` 转换命令。其余内容保持不变。以下是完整的、更新后的 README 文件：
-
----
-
 # PanSVScope: Comprehensive Structural Variant Analysis Toolkit
 
 **PanSVScope** is an integrated, end‑to‑end C‑based pipeline for comprehensive structural variant (SV) analysis across multiple samples. It covers the full lifecycle of SV analysis from raw read alignment to population‑level genotyping:

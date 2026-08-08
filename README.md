@@ -296,7 +296,7 @@ Align paired‑end reads, sort, mark duplicates and index. Supports two alignmen
 | `--BWA` | Path to BWA‑MEM executable (optional, but at least one aligner is required) |
 | `--Minibwa` | Path to minibwa executable (optional, takes precedence if both provided) |
 | `--SAMBAMBA` | Path to Sambamba executable (required) |
-| `--lowswap` |	Enable low-memory mode for Sambamba steps. Limits Sambamba threads to at most 4, reducing memory/swap usage during sort, markdup, and index, while aligner still uses --THREADS. (optional) |
+| `--lowswap` |	Enable low-memory mode for Sambamba steps. Limits Sambamba threads to at most 4, reducing memory/swap usage during sort, markdup, and index. (optional) |
 | `-h, --help` | Show help message |
 
 **Pipeline steps:** Alignment (BWA or minibwa) → SAM to BAM conversion → sorting → duplicate marking → indexing → cleanup of intermediate files.

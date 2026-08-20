@@ -331,7 +331,7 @@ Ensemble SV calling using multiple tools.
 | Option | Description |
 |--------|-------------|
 | `--id` | Sample identifier (required) |
-| `--bam` | Input BAM file (sorted and indexed) (required) |
+| `--bam` | Input BAM file (sorted and ".bai" indexed) (required) |
 | `--genome` | Reference genome FASTA (required) |
 | `--outdir` | Output directory (required) |
 | `--threads` | Number of CPU threads [default: 1] |

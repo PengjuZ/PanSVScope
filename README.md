@@ -63,6 +63,7 @@ The following tools are **not** included and must be installed separately by the
 | samtools | 1.23 | Install via conda (Python 3.11 environment) |
 | bgzip / tabix | 1.23 (htslib) | Install via conda (Python 3.11 environment) |
 | bcftools | 1.23.1 | Install via conda (Python 3.11 environment) |
+| svtyper | 0.7.1 | Install for Manta and smoove |
 | Manta | 1.6.0 | Requires Python 2.7 environment (separate conda env) |
 | smoove | 0.2.8 | Requires Python 2.7 environment (separate conda env) |
 | dysgu | 1.40 / 1.70 / 1.87 | Requires its own isolated conda environment (see below) |

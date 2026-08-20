@@ -511,9 +511,32 @@ Output: `{workdir}/SVgeno.vcf.gz` – a VCF with genotype columns for all sample
     ➤ **Download links:** [See our data repository – XXXXA]  
 
 14. **Building and using `--pgenome` files**  
-    If you wish to construct a custom pan‑genome VCF for your own set of genomes, we recommend using **cactus-pangenome** with the `--vcf` flag to produce a `pangenome.vcf.gz` file.  
+    If you wish to construct a custom pan‑genome VCF for your own set of genomes, we recommend using **cactus-pangenome** with the `--vcf` flag to produce a `pangenome.vcf.gz` file. A recommended command for a pig‑sized project (adjust cores, memory, and disk as needed) is:
+
+    ```bash
+    cactus-pangenome --binariesMode local \
+                     --maxCores 32 \
+                     --maxMemory 500G \
+                     --defaultDisk 100G \
+                     --workDir ./Tmp/ \
+                     ./jobS \
+                     SeqFile.list \
+                     --outDir ./Out \
+                     --outName pangenome \
+                     --chop \
+                     --permissiveContigFilter \
+                     --reference Ref \
+                     --vcf
+    ```
+
+    - `--binariesMode local` – use local executables (instead of Docker/Singularity).  
+    - `--maxCores` / `--maxMemory` / `--defaultDisk` – resource limits for the pipeline.  
+    - `SeqFile.list` – a two‑column file listing sample names and genome FASTA paths.  
+    - `--reference Ref` – specify the reference genome name (must match a sample in `SeqFile.list`).  
+    - `--vcf` – ensures generation of a VCF file (`pangenome.vcf.gz`) for use with `pangra --pgenome`.  
+
     The resulting `pangenome.vcf.gz` can be used directly with `pangra --pgenome`.  
-    Additionally, we provide pre‑built pan‑genome VCF files for several species (human, cattle, pig, etc.) to save you computation time.  
+    Additionally, we provide pre‑built pan‑genome VCF files for several species (cattle, pig, etc.) to save you computation time.  
     ➤ **Download links:** [See our data repository – XXXXB]  
 
 15. **Quick SV genotyping for a few samples**  

@@ -158,15 +158,15 @@ python -m pip install . --no-build-isolation \
 
 ```bash
 PanSVScope mapr \
-  --ID sample01 \
-  --GENOME hg38.fa \
-  --R1 sample01_R1.fastq.gz \
-  --R2 sample01_R2.fastq.gz \
-  --OUTDIR ./bams \
-  --TMPDIR ./tmp \
-  --THREADS 32 \
-  --BWA /usr/bin/bwa \
-  --SAMBAMBA /usr/bin/sambamba
+  --ID=sample01 \
+  --GENOME=hg38.fa \
+  --R1=sample01_R1.fastq.gz \
+  --R2=sample01_R2.fastq.gz \
+  --OUTDIR=./bams \
+  --TMPDIR=./tmp \
+  --THREADS=32 \
+  --BWA=/usr/bin/bwa \
+  --SAMBAMBA=/usr/bin/sambamba
 ```
 
 Output: `./bams/sample01.bam` and `./bams/sample01.bam.bai`.
@@ -175,22 +175,22 @@ Output: `./bams/sample01.bam` and `./bams/sample01.bam.bai`.
 
 ```bash
 PanSVScope svcall \
-  --id sample01 \
-  --bam ./bams/sample01.bam \
-  --genome hg38.fa \
-  --outdir ./sv_calls \
-  --threads 16 \
+  --id=sample01 \
+  --bam=./bams/sample01.bam \
+  --genome=hg38.fa \
+  --outdir=./sv_calls \
+  --threads=16 \
   --clean-temp \
-  --manta /usr/bin/configManta.py \
-  --Pythonformanta /usr/bin/python2 \
-  --delly /usr/bin/delly \
-  --wham /usr/bin/whamg \
-  --smoove /usr/bin/smoove \
-  --dysgu /usr/bin/dysgu \
-  --matchclips /usr/local/bin/matchclips \
-  --survivor /usr/local/bin/SURVIVOR \
-  --bcftools /usr/bin/bcftools \
-  --samtools-bindir /usr/bin
+  --manta=/usr/bin/configManta.py \
+  --Pythonformanta=/usr/bin/python2 \
+  --delly=/usr/bin/delly \
+  --wham=/usr/bin/whamg \
+  --smoove=/usr/bin/smoove \
+  --dysgu=/usr/bin/dysgu \
+  --matchclips=/usr/local/bin/matchclips \
+  --survivor=/usr/local/bin/SURVIVOR \
+  --bcftools=/usr/bin/bcftools \
+  --samtools-bindir=/usr/bin
 ```
 
 Output: `./sv_calls/sample01.SVout.txt` (consolidated SV calls) and `./sv_calls/sample01.SVcall.log`.
@@ -209,24 +209,24 @@ Then run:
 
 ```bash
 PanSVScope pangra \
-  --workdir ./pangraph_results \
-  --genome hg38.fa \
-  --sv-out-list wgs_sv_list.txt \
-  --known-sv gnomad_sv.txt \
-  --pgenome 1kGP.pangenome.vcf.gz \
-  --threads 32 \
+  --workdir=./pangraph_results \
+  --genome=hg38.fa \
+  --sv-out-list=wgs_sv_list.txt \
+  --known-sv=gnomad_sv.txt \
+  --pgenome=1kGP.pangenome.vcf.gz \
+  --threads=32 \
   --clean \
-  --bedtools /usr/bin/bedtools \
-  --vcfwave /usr/bin/vcfwave \
-  --check-sv-tools /usr/local/bin/CheckSV \
-  --markdup /usr/local/bin/markdup \
-  --minimap2 /usr/bin/minimap2 \
-  --graphvcf /usr/local/bin/graphvcf \
-  --vg /usr/local/bin/vg \
-  --pangenie-index /usr/local/bin/PanGenie-index \
-  --parallel /usr/bin/parallel \
-  --bgzip /usr/bin/bgzip \
-  --tabix /usr/bin/tabix
+  --bedtools=/usr/bin/bedtools \
+  --vcfwave=/usr/bin/vcfwave \
+  --check-sv-tools=/usr/local/bin/CheckSV \
+  --markdup=/usr/local/bin/markdup \
+  --minimap2=/usr/bin/minimap2 \
+  --graphvcf=/usr/local/bin/graphvcf \
+  --vg=/usr/local/bin/vg \
+  --pangenie-index=/usr/local/bin/PanGenie-index \
+  --parallel=/usr/bin/parallel \
+  --bgzip=/usr/bin/bgzip \
+  --tabix=/usr/bin/tabix
 ```
 
 Outputs: `./pangraph_results/SVsets.Merge.vcf.gz` (integrated SV set), `./pangraph_results/Index/` (graph indexes for VG‑Giraffe and PanGenie).
@@ -235,24 +235,24 @@ Outputs: `./pangraph_results/SVsets.Merge.vcf.gz` (integrated SV set), `./pangra
 
 ```bash
 PanSVScope svgeno \
-  --id sample01 \
-  --workdir ./svgeno_out \
-  --index ./pangraph_results/Index \
-  --genome hg38.fa \
-  --bam ./bams/sample01.bam \
-  --r1 sample01_R1.fastq.gz \
-  --r2 sample01_R2.fastq.gz \
+  --id=sample01 \
+  --workdir=./svgeno_out \
+  --index=./pangraph_results/Index \
+  --genome=hg38.fa \
+  --bam=./bams/sample01.bam \
+  --r1=sample01_R1.fastq.gz \
+  --r2=sample01_R2.fastq.gz \
   --enable-all \
-  --threads 24 \
-  --vg /usr/bin/vg \
-  --bayestyper-tools /usr/bin/bayesTyperTools \
-  --bayestyper /usr/bin/bayesTyper \
-  --kmc /usr/bin/kmc \
-  --graphtyper /usr/bin/graphtyper \
-  --sambamba /usr/bin/sambamba \
-  --pangenie /usr/bin/PanGenie \
-  --graphvcf /usr/local/bin/graphvcf \
-  --bgzip /usr/bin/bgzip
+  --threads=24 \
+  --vg=/usr/bin/vg \
+  --bayestyper-tools=/usr/bin/bayesTyperTools \
+  --bayestyper=/usr/bin/bayesTyper \
+  --kmc=/usr/bin/kmc \
+  --graphtyper=/usr/bin/graphtyper \
+  --sambamba=/usr/bin/sambamba \
+  --pangenie=/usr/bin/PanGenie \
+  --graphvcf=/usr/local/bin/graphvcf \
+  --bgzip=/usr/bin/bgzip
 ```
 
 Outputs: `./svgeno_out/sample01/h.sample01.vcf.gz` (high‑confidence merged genotypes), plus per‑tool VCFs (`VG-Giraffe.vcf.gz`, `BayesTyper.vcf.gz`, etc.).
@@ -271,10 +271,10 @@ Then run:
 
 ```bash
 PanSVScope svmer \
-  --workdir ./svmerge_out \
-  --SVindex ./pangraph_results/Index/Index.vcf.gz \
-  --Vcflist vcf_list.txt \
-  --BGZIP /usr/bin/bgzip
+  --workdir=./svmerge_out \
+  --SVindex=./pangraph_results/Index/Index.vcf.gz \
+  --Vcflist=vcf_list.txt \
+  --BGZIP=/usr/bin/bgzip
 ```
 
 Output: `./svmerge_out/SVgeno.vcf.gz` – a multi‑sample VCF with genotype columns for every sample.

@@ -18,6 +18,23 @@
 - [Citation](#citation)
 - [License](#license)
 
+---
+
+## ⚠️ Important: Reference Genome Format Requirement
+
+**Your reference genome must contain only uppercase letters (A, C, G, T, N).**  
+Many SV callers and graph‑building tools treat lowercase bases as **masked** (e.g., repeats or low‑complexity regions) and may ignore or mishandle them, leading to missed or incorrect variant calls.
+
+If your reference contains lowercase (soft‑masked) bases, convert it to uppercase using `seqtk`:
+
+```bash
+seqtk seq -A -U ref.fa -l 60 > ref.upper.fa
+```
+
+Then use `ref.upper.fa` as your reference for **all** PanSVScope modules (mapr, svcall, pangra, svgeno, svmer). Remember to re‑index (BWA, samtools, etc.) after conversion.
+
+---
+
 ## Installation
 
 ### Dependencies
@@ -511,7 +528,7 @@ Output: `{workdir}/SVgeno.vcf.gz` – a VCF with genotype columns for all sample
     ➤ **Download links:** [See our data repository – XXXXA]  
 
 14. **Building and using `--pgenome` files**  
-    If you wish to construct a custom pan‑genome VCF for your own set of genomes, we recommend using **cactus-pangenome** with the `--vcf` flag to produce a `pangenome.vcf.gz` file. A recommended command for a pig‑sized project (adjust cores, memory, and disk as needed) is:
+    If you wish to construct a custom pan‑genome VCF for your own set of genomes, we recommend using **cactus-pangenome** with the `--vcf` flag to produce a `pangenome.vcf.gz` file. A recommended command for a human‑sized project (adjust cores, memory, and disk as needed) is:
 
     ```bash
     cactus-pangenome --binariesMode local \
@@ -526,6 +543,7 @@ Output: `{workdir}/SVgeno.vcf.gz` – a VCF with genotype columns for all sample
                      --chop \
                      --permissiveContigFilter \
                      --reference Ref \
+                     --giraffe clip filter \
                      --vcf
     ```
 
@@ -533,10 +551,11 @@ Output: `{workdir}/SVgeno.vcf.gz` – a VCF with genotype columns for all sample
     - `--maxCores` / `--maxMemory` / `--defaultDisk` – resource limits for the pipeline.  
     - `SeqFile.list` – a two‑column file listing sample names and genome FASTA paths.  
     - `--reference Ref` – specify the reference genome name (must match a sample in `SeqFile.list`).  
+    - `--giraffe clip filter` – enables Giraffe‑compatible graph construction and filtering.  
     - `--vcf` – ensures generation of a VCF file (`pangenome.vcf.gz`) for use with `pangra --pgenome`.  
 
     The resulting `pangenome.vcf.gz` can be used directly with `pangra --pgenome`.  
-    Additionally, we provide pre‑built pan‑genome VCF files for several species (cattle, pig, etc.) to save you computation time.  
+    Additionally, we provide pre‑built pan‑genome VCF files for several species (human, cattle, pig, etc.) to save you computation time.  
     ➤ **Download links:** [See our data repository – XXXXB]  
 
 15. **Quick SV genotyping for a few samples**  
@@ -544,14 +563,6 @@ Output: `{workdir}/SVgeno.vcf.gz` – a VCF with genotype columns for all sample
     - **Step 1:** Run `pangra` with **only** `--known-sv` (and optionally `--pgenome`, but at least `--known-sv`). This will create a merged VCF and indexes using the known SV database.
     - **Step 2:** Run `svgeno` with **only** PanGenie (`--enable-pangenie`) using the indexes produced in Step 1.  
     This two‑step approach is fast and does not require WGS‑based SV calls (i.e., you can skip `svcall`).
-
-16. **Reference genome format – uppercase only**  
-    Many SV callers and graph‑building tools treat lowercase bases as **masked** (e.g., repeats or low‑complexity regions) and may ignore or mishandle them. To ensure consistent and accurate SV detection, **your reference genome must contain only uppercase letters** (A, C, G, T, N).  
-    If your reference contains lowercase (soft‑masked) bases, convert it to uppercase using `seqtk`:
-    ```bash
-    seqtk seq -A -U ref.fa -l 60 > ref.upper.fa
-    ```
-    Then use `ref.upper.fa` as your reference for all PanSVScope modules.
 
 ## Citation
 

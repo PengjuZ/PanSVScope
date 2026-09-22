@@ -274,6 +274,8 @@ PanSVScope svgeno \
 
 Outputs: `./svgeno_out/sample01/h.sample01.vcf.gz` (high‑confidence merged genotypes), plus per‑tool VCFs (`VG-Giraffe.vcf.gz`, `BayesTyper.vcf.gz`, etc.).
 
+> If the run is interrupted (e.g., one tool fails due to insufficient memory), simply re‑invoke the same command. Completed tools will be skipped automatically, and only the failed tool will be re‑run. Add `--force` if you want to rerun all enabled tools regardless of existing outputs.
+
 ### 5. Merge multiple sample VCFs into a population matrix (svmer)
 
 Create `vcf_list.txt` with paths to each sample’s final high‑confidence VCF (h.sample*.vcf.gz from svgeno):
@@ -421,6 +423,7 @@ Graph‑based genotyping using multiple methods.
 | `--enable-graphtyper2` | Enable GraphTyper2 |
 | `--enable-pangenie` | Enable PanGenie |
 | `--enable-all` | Enable all four tools |
+| `--force` | Force rerun of all enabled tools, ignoring any existing output VCFs (optional) |
 | `--vg` | Path to vg (required if VG‑Giraffe enabled) |
 | `--bayestyper-tools` | Path to BayesTyperTools (required if BayesTyper enabled) |
 | `--bayestyper` | Path to BayesTyper (required if BayesTyper enabled) |
@@ -433,6 +436,8 @@ Graph‑based genotyping using multiple methods.
 | `--help` | Show help message |
 
 At least one genotyping tool must be enabled. The final merged VCF is written as `{workdir}/{id}/{id}.vcf.gz`.
+
+**Resume support:** By default, if a tool's output VCF already exists and passes a validity check (non‑empty, valid gzip stream, and contains a VCF header), that tool is **skipped** on subsequent runs. This is useful when a run is interrupted — for example, due to out‑of‑memory failures on high‑depth data — and you want to avoid recomputing tools that already finished. The merge step runs only when **all enabled tools** have produced valid outputs; if any enabled tool is missing or invalid, the merge is skipped and a message is printed. Re‑running the same command will only re‑execute the failed tool(s). Use `--force` to disable resume behaviour and rerun every enabled tool from scratch.
 
 ### `PanSVScope svmer`
 
@@ -475,6 +480,8 @@ Output: `{workdir}/SVgeno.vcf.gz` – a VCF with genotype columns for all sample
 - `<workdir>/<id>/GraphTyper2.vcf.gz` – GraphTyper2 results (if enabled)
 - `<workdir>/<id>/PanGenie.vcf.gz` – PanGenie results (if enabled)
 
+> **Resume note:** Each per‑tool VCF (`VG-Giraffe.vcf.gz`, `BayesTyper.vcf.gz`, `GraphTyper2.vcf.gz`, `PanGenie.vcf.gz`) acts as a checkpoint. If the pipeline is re‑run with the same command, any tool whose output file already exists and is valid will be skipped. The merged high‑confidence VCF (`h.<id>.vcf.gz`) is only regenerated when every enabled tool's output is present and valid.
+
 ### svmer outputs
 - `<workdir>/SVgeno.vcf.gz` – multi‑sample VCF with one column per input sample
 - `<workdir>/TMP/` and `<workdir>/TMPfile/` – temporary files (automatically cleaned)
@@ -497,9 +504,9 @@ Output: `{workdir}/SVgeno.vcf.gz` – a VCF with genotype columns for all sample
    All inputs (BAM, reference, VCFs, index files) must use consistent chromosome names (e.g., `chr1` vs `1`). Inconsistent naming will cause errors.
 
 6. **Memory and disk space**  
-   - `mapr` sorting uses 16 GB per thread (configurable via Sambamba’s `-m` parameter in the code).  
+   - `mapr` sorting uses 16 GB per thread (configurable via Sambamba’s `-m` parameter in the code).  
    - `pangra` phases may create large intermediate files; ensure `TMPDIR` or the working directory has sufficient free space (at least 2× the size of input FASTQ files).  
-   - `svgeno` runs multiple tools sequentially; each tool may use substantial memory (e.g., VG‑Giraffe >32 GB for human genomes).
+   - `svgeno` runs multiple tools sequentially; each tool may use substantial memory (e.g., VG‑Giraffe >32 GB for human genomes).
 
 7. **Running phases independently**  
    `pangra` allows re‑running individual phases with the `--phase` option, which is useful for debugging or when only part of the pipeline needs to be updated.
@@ -563,6 +570,9 @@ Output: `{workdir}/SVgeno.vcf.gz` – a VCF with genotype columns for all sample
     - **Step 1:** Run `pangra` with **only** `--known-sv` (and optionally `--pgenome`, but at least `--known-sv`). This will create a merged VCF and indexes using the known SV database.
     - **Step 2:** Run `svgeno` with **only** PanGenie (`--enable-pangenie`) using the indexes produced in Step 1.  
     This two‑step approach is fast and does not require WGS‑based SV calls (i.e., you can skip `svcall`).
+
+16. **Resume after failure (`svgeno`)**  
+    For memory‑intensive runs — especially with high‑depth WGS data — individual genotyping tools may be terminated by the operating system (e.g., out‑of‑memory kills) while others complete successfully. `svgeno` supports **checkpoint‑based resume**: on re‑running the same command, tools whose output VCFs are already present and valid are skipped, and only the failed tool(s) are re‑executed. The merge step is deferred until **all enabled tools** have produced valid outputs. Add `--force` to bypass this behaviour and rerun every enabled tool from scratch (useful when inputs have changed or when you suspect a previous output is corrupted despite passing validation).
 
 ## Citation
 

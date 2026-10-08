@@ -291,7 +291,7 @@ Then run:
 ```bash
 PanSVScope svmer \
   --workdir=./svmerge_out \
-  --SVindex=./pangraph_results/Index/Index.vcf.gz \
+  --SVindex=./pangraph_results/Index/ \
   --Vcflist=vcf_list.txt \
   --BGZIP=/usr/bin/bgzip
 ```

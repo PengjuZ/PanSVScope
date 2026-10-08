@@ -446,7 +446,7 @@ Merge multiple VCFs into a multi‑sample VCF.
 | Option | Description |
 |--------|-------------|
 | `--workdir` | Working directory (required) |
-| `--SVindex` | Index VCF (from `pangra`, e.g., `Index.vcf.gz`) (required) |
+| `--SVindex` | Index VCF directory (from `pangra`) (required) |
 | `--Vcflist` | File listing input VCFs (one per line) (required) |
 | `--BGZIP` | Path to bgzip (required) |
 | `--help` | Show help message |

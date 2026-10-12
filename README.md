@@ -15,6 +15,7 @@
 - [Command Reference](#command-reference)
 - [Output File Descriptions](#output-file-descriptions)
 - [Important Notes](#important-notes)
+- [Running with Singularity](SINGULARITY.md)
 - [Citation](#citation)
 - [License](#license)
 
@@ -92,6 +93,10 @@ You can also run it directly:
 ```bash
 ./PanSVScope --help
 ```
+
+### Running with a Singularity image
+
+If you prefer not to install any of the external tools locally, a pre‑built Singularity image is available that bundles PanSVScope together with all required tools and conda environments. See the dedicated [**SINGULARITY.md**](SINGULARITY.md) for full instructions, including bind‑mount recipes and a ready‑to‑use SLURM batch script.
 
 ### Conda environment setup
 

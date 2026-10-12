@@ -379,7 +379,7 @@ Integrate SVs from multiple sources and build a variation graph.
 | `--workdir` | Working directory (required) |
 | `--genome` | Reference genome FASTA (required) |
 | `--sv-out-list` | File listing `.SVout.txt` files (WGS calls) |
-| `--known-sv` | Known SV database (tab‑delimited) |
+| `--known-sv` | Known SV database (tab-delimited; .txt or .txt.gz) |
 | `--pgenome` | Existing pan‑genome VCF (gzipped, tabix‑indexed) |
 | `--threads` | Number of CPU threads [default: 1] |
 | `--clean` | Remove temporary files after completion |

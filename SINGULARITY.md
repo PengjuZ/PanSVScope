@@ -15,8 +15,8 @@ instead, please refer to the main [README](README.md).
 - [Environment Variables – The Variables Used in Examples](#environment-variables--the-variables-used-in-examples)
 - [Module 1 – mapr (read alignment)](#module-1--mapr-read-alignment)
 - [Module 2 – svcall (ensemble SV calling)](#module-2--svcall-ensemble-sv-calling)
-- [Module 3 – pangra (pan‑genome graph construction)](#module-3--pangra-pan-genome-graph-construction)
-- [Module 4 – svgeno (graph‑based genotyping)](#module-4--svgeno-graph-based-genotyping)
+- [Module 3 – pangra (pan-genome graph construction)](#module-3--pangra-pan-genome-graph-construction)
+- [Module 4 – svgeno (graph-based genotyping)](#module-4--svgeno-graph-based-genotyping)
 - [Module 5 – svmer (population matrix)](#module-5--svmer-population-matrix)
 - [Running on SLURM](#running-on-slurm)
 - [Troubleshooting](#troubleshooting)
@@ -70,52 +70,44 @@ Singularity isolates the container from the host filesystem by default. You
 must explicitly bind the host directories that contain your **inputs** and
 **outputs**, otherwise PanSVScope will not see them.
 
-For a typical full run you will need to mount:
+For a typical full run you will need to mount the following directories. The
+example uses shell variables (`${DIR_*}`, `${SampleID}`, …) that you define
+once at the top of your script — see [Environment Variables](#environment-variables--the-variables-used-in-examples).
 
-| Host directory     | Purpose                                              |
-|--------------------|------------------------------------------------------|
-| `${DIR_fastq}`     | Raw FASTQ files (`R1`, `R2`)                         |
-| `${DIR_Ref_Fasta}` | Reference genome FASTA (and its `.fai`, `.bwt`, etc.)|
-| `${DIR_bam}`       | Input/output BAM files                               |
-| `${DIR_tmp}`       | Temporary directory for sorting / intermediate files |
-| `${DIR_svcall}`    | Output of `svcall` (`.SVout.txt` files)              |
-| `${DIR_known_sv}`  | Pre‑built known‑SV database directory                |
-| `${DIR_pgenome}`   | Pre‑built pan‑genome VCF directory                   |
-| `${DIR_Index}`     | Graph index directory from `pangra`                  |
-| `${DIR_vcf_list}`  | File listing per‑sample VCFs for `svmer`             |
-| `${DIR_svgeno}`    | Output directory of `svgeno` (per‑sample VCFs)       |
-| `${DIR_out}`       | Generic output directory for the current module      |
+| Variable             | Purpose                                              |
+|----------------------|------------------------------------------------------|
+| `${DIR_fastq}`       | Raw FASTQ files (`R1`, `R2`)                         |
+| `${DIR_Ref_Fasta}`   | Reference genome FASTA (and its `.fai`, `.bwt`, etc.)|
+| `${DIR_bam}`         | Input/output BAM files                               |
+| `${DIR_tmp}`         | Temporary directory for sorting / intermediate files |
+| `${DIR_svcall}`      | Output of `svcall` (`.SVout.txt` files)              |
+| `${DIR_known_sv}`    | Pre‑built known‑SV database directory                |
+| `${DIR_pgenome}`     | Pre‑built pan‑genome VCF directory                   |
+| `${DIR_Index}`       | Graph index directory from `pangra`                  |
+| `${DIR_vcf_list}`    | Directory containing the VCF list for `svmer`        |
+| `${DIR_svgeno}`      | Output directory of `svgeno` (per‑sample VCFs)       |
+| `${DIR_out}`         | Generic output directory for the current module      |
+
+Multiple directories can be passed in a single `--bind` argument separated by
+commas:
+
+```bash
+--bind "${DIR_fastq}","${DIR_Ref_Fasta}","${DIR_bam}","${DIR_tmp}"
+```
 
 You do **not** need to mount `/opt/PanSVScope`, `/opt/envs/`, or any tool
 under them — those are already inside the image.
 
-### Example: setting up variables
-
-```bash
-export PanSVScope_SIF=/path/to/pansvscope_1.0.0.sif
-
-export DIR_fastq=/data/fastq
-export DIR_Ref_Fasta=/data/ref
-export DIR_bam=/data/bam
-export DIR_tmp=/scratch/tmp
-export DIR_svcall=/data/svcall
-export DIR_known_sv=/data/known_sv
-export DIR_pgenome=/data/pangenome
-export DIR_Index=/data/pangraph_results/Index
-export DIR_vcf_list=/data/vcf_lists
-export DIR_svgeno=/data/svgeno
-export DIR_out=/data/output
-
-export SampleID=sample01
-export REF_FASTA=${DIR_Ref_Fasta}/ref.upper.fa     # uppercase, non-soft-masked
-export IN_R1=${DIR_fastq}/${SampleID}_R1.fastq.gz
-export IN_R2=${DIR_fastq}/${SampleID}_R2.fastq.gz
-export IN_Bam=${DIR_bam}/${SampleID}.bam
-export SVOUT_LIST=${DIR_svcall}/svout_list.txt
-export KNOWN_SV=${DIR_known_sv}/known_sv.txt
-export PGENOME_VCF=${DIR_pgenome}/pangenome.vcf.gz
-export VCF_LIST=${DIR_vcf_list}/vcf_list.txt
-```
+> **Tip:** If most of your data lives under a single parent directory (e.g.,
+> `/data`), you can bind just that parent once:
+>
+> ```bash
+> --bind /data:/data
+> ```
+>
+> This is simpler but gives the container access to the entire `/data` tree.
+> Bind only what you actually need if you have strict access‑control
+> requirements.
 
 > **Reminder (see main README):** the reference genome must contain only
 > uppercase letters (A/C/G/T/N). If it is soft‑masked, convert it first with
@@ -134,9 +126,10 @@ For example:
 --bind "${DIR_bam}","${DIR_Ref_Fasta}"
 ```
 
-means the host directory `/data/bam` is also visible as `/data/bam` inside the
-container. Therefore you can safely use `${REF_FASTA}`, `${IN_Bam}`, etc., both
-in shell scripts outside the container and in `PanSVScope` arguments inside it.
+If `${DIR_bam}` is `/data/bam`, then `/data/bam` is also visible as
+`/data/bam` inside the container. Therefore you can safely use variables like
+`${REF_FASTA}`, `${IN_Bam}`, etc., both in shell scripts outside the container
+and in `PanSVScope` arguments inside it.
 
 If you prefer to bind to a **different path** inside the container (e.g., to
 avoid long host paths), use the `src:dst` syntax:
@@ -153,6 +146,10 @@ error‑prone.
 
 ## Environment Variables – The Variables Used in Examples
 
+The examples below use the following shell variables. They are expanded by the
+host shell **before** `singularity exec` runs, so they are unaffected by the
+container's `--cleanenv` flag.
+
 | Variable                 | Meaning                                              |
 |--------------------------|------------------------------------------------------|
 | `PanSVScope_SIF`         | Absolute path to the Singularity image               |
@@ -166,6 +163,34 @@ error‑prone.
 | `VCF_LIST`               | File listing per‑sample VCFs for `svmer`             |
 | `SLURM_CPUS_PER_TASK`    | Number of CPUs allocated by SLURM (auto‑set by SLURM)|
 | `DIR_*`                  | Host directories that must be bind‑mounted           |
+
+You can define them once at the top of your script:
+
+```bash
+export PanSVScope_SIF=/path/to/pansvscope_1.0.0.sif
+
+export DIR_fastq=/data/fastq
+export DIR_Ref_Fasta=/data/ref
+export DIR_bam=/data/bam
+export DIR_tmp=/scratch/tmp
+export DIR_svcall=/data/svcall
+export DIR_known_sv=/data/known_sv
+export DIR_pgenome=/data/pangenome
+export DIR_Index=/data/pangraph_results/Index
+export DIR_vcf_list=/data/vcf_lists
+export DIR_svgeno=/data/svgeno
+export DIR_out=/data/output
+
+export SampleID=sample01
+export REF_FASTA=${DIR_Ref_Fasta}/ref.upper.fa
+export IN_R1=${DIR_fastq}/${SampleID}_R1.fastq.gz
+export IN_R2=${DIR_fastq}/${SampleID}_R2.fastq.gz
+export IN_Bam=${DIR_bam}/${SampleID}.bam
+export SVOUT_LIST=${DIR_svcall}/svout_list.txt
+export KNOWN_SV=${DIR_known_sv}/known_sv.txt
+export PGENOME_VCF=${DIR_pgenome}/pangenome.vcf.gz
+export VCF_LIST=${DIR_vcf_list}/vcf_list.txt
+```
 
 > **Note:** In a SLURM batch script, `SLURM_CPUS_PER_TASK` is set automatically
 > by SLURM when you use `#SBATCH --cpus-per-task=N`. If you run interactively,
@@ -235,7 +260,7 @@ singularity exec --cleanenv \
 
 ---
 
-## Module 3 – pangra (pan‑genome graph construction)
+## Module 3 – pangra (pan-genome graph construction)
 
 Integrates WGS SVs, known‑SV databases, and existing pan‑genome VCFs into a
 unified variation graph.
@@ -270,7 +295,7 @@ indexes for VG‑Giraffe and PanGenie).
 
 ---
 
-## Module 4 – svgeno (graph‑based genotyping)
+## Module 4 – svgeno (graph-based genotyping)
 
 Genotypes a sample using VG‑Giraffe, BayesTyper, GraphTyper2, and/or PanGenie,
 then merges the results into a high‑confidence VCF.

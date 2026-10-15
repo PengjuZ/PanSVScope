@@ -503,7 +503,7 @@ echo "All modules completed."
 **Tips for SLURM:**
 
 - `--cpus-per-task` determines the value of `${SLURM_CPUS_PER_TASK}`, which is
-  passed to PanSVScope via `--THREADS`.
+  passed to PanSVScope via `--threads`.
 - If a module exhausts memory, either increase `--mem`, or enable PanSVScope's
   resume feature (`svgeno`) and rerun the job — completed tools will be
   skipped.

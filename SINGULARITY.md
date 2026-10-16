@@ -207,15 +207,15 @@ singularity exec --cleanenv \
   --bind "${DIR_fastq}","${DIR_Ref_Fasta}","${DIR_bam}","${DIR_tmp}" \
   "${PanSVScope_SIF}" \
   PanSVScope mapr \
-  --ID="${SampleID}" \
-  --GENOME="${REF_FASTA}" \
-  --R1="${IN_R1}" \
-  --R2="${IN_R2}" \
-  --OUTDIR="${DIR_bam}" \
-  --TMPDIR="${DIR_tmp}" \
-  --THREADS="${SLURM_CPUS_PER_TASK}" \
-  --BWA=/opt/PanSVScope/Bin/bwa \
-  --SAMBAMBA=/opt/PanSVScope/Bin/sambamba
+  --id="${SampleID}" \
+  --genome="${REF_FASTA}" \
+  --r1="${IN_R1}" \
+  --r2="${IN_R2}" \
+  --outdir="${DIR_bam}" \
+  --tmpdir="${DIR_tmp}" \
+  --threads="${SLURM_CPUS_PER_TASK}" \
+  --bwa=/opt/PanSVScope/Bin/bwa \
+  --sambamba=/opt/PanSVScope/Bin/sambamba
 ```
 
 **Output:** `${DIR_bam}/${SampleID}.bam` and `${DIR_bam}/${SampleID}.bam.bai`.
@@ -405,15 +405,15 @@ singularity exec --cleanenv \
   --bind "${DIR_fastq}","${DIR_Ref_Fasta}","${DIR_bam}","${DIR_tmp}" \
   "${PanSVScope_SIF}" \
   PanSVScope mapr \
-    --ID="${SampleID}" \
-    --GENOME="${REF_FASTA}" \
-    --R1="${IN_R1}" \
-    --R2="${IN_R2}" \
-    --OUTDIR="${DIR_bam}" \
-    --TMPDIR="${DIR_tmp}" \
-    --THREADS="${SLURM_CPUS_PER_TASK}" \
-    --BWA=/opt/PanSVScope/Bin/bwa \
-    --SAMBAMBA=/opt/PanSVScope/Bin/sambamba
+    --id="${SampleID}" \
+    --genome="${REF_FASTA}" \
+    --r1="${IN_R1}" \
+    --r2="${IN_R2}" \
+    --outdir="${DIR_bam}" \
+    --tmpdir="${DIR_tmp}" \
+    --threads="${SLURM_CPUS_PER_TASK}" \
+    --bwa=/opt/PanSVScope/Bin/bwa \
+    --sambamba=/opt/PanSVScope/Bin/sambamba
 
 # ---- Module 2: svcall ---------------------------------------------------
 singularity exec --cleanenv \

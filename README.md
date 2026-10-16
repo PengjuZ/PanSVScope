@@ -180,15 +180,15 @@ python -m pip install . --no-build-isolation \
 
 ```bash
 PanSVScope mapr \
-  --ID=sample01 \
-  --GENOME=hg38.fa \
-  --R1=sample01_R1.fastq.gz \
-  --R2=sample01_R2.fastq.gz \
-  --OUTDIR=./bams \
-  --TMPDIR=./tmp \
-  --THREADS=32 \
-  --BWA=/usr/bin/bwa \
-  --SAMBAMBA=/usr/bin/sambamba
+  --id=sample01 \
+  --genome=hg38.fa \
+  --r1=sample01_R1.fastq.gz \
+  --r2=sample01_R2.fastq.gz \
+  --outdir=./bams \
+  --tmpdir=./tmp \
+  --threads=32 \
+  --bwa=/usr/bin/bwa \
+  --sambamba=/usr/bin/sambamba
 ```
 
 Output: `./bams/sample01.bam` and `./bams/sample01.bam.bai`.
@@ -311,16 +311,16 @@ Align paired‑end reads, sort, mark duplicates and index. Supports two alignmen
 
 | Option | Description |
 |--------|-------------|
-| `--ID` | Sample identifier (used in read groups and output names) (required) |
-| `--GENOME` | Reference genome FASTA file (for BWA) or index prefix (for minibwa) (required) |
-| `--R1` | Forward FASTQ file (may be gzipped) (required) |
-| `--R2` | Reverse FASTQ file (required) |
-| `--OUTDIR` | Output directory for final BAM and index (required) |
-| `--TMPDIR` | Temporary directory for sorting (required) |
-| `--THREADS` | Number of CPU threads (required) |
-| `--BWA` | Path to BWA‑MEM executable (optional, but at least one aligner is required) |
-| `--Minibwa` | Path to minibwa executable (optional, takes precedence if both provided) |
-| `--SAMBAMBA` | Path to Sambamba executable (required) |
+| `--id` | Sample identifier (used in read groups and output names) (required) |
+| `--genome` | Reference genome FASTA file (for BWA) or index prefix (for minibwa) (required) |
+| `--r1` | Forward FASTQ file (may be gzipped) (required) |
+| `--r2` | Reverse FASTQ file (required) |
+| `--outdir` | Output directory for final BAM and index (required) |
+| `--tmpdir` | Temporary directory for sorting (required) |
+| `--threads` | Number of CPU threads (required) |
+| `--bwa` | Path to BWA‑MEM executable (optional, but at least one aligner is required) |
+| `--minibwa` | Path to minibwa executable (optional, takes precedence if both provided) |
+| `--sambamba` | Path to Sambamba executable (required) |
 | `--lowswap` | Enable low-memory mode for Sambamba steps. (optional) |
 | `-h, --help` | Show help message |
 
@@ -342,11 +342,11 @@ minibwa index hg38.fa hg38.fa
 **Examples:**
 - Using BWA:
 ```bash
-PanSVScope mapr --ID=sample01 --GENOME=hg38.fa --R1=sample01_R1.fq.gz --R2=sample01_R2.fq.gz --OUTDIR=./bams --TMPDIR=./tmp --THREADS=32 --BWA=/usr/bin/bwa --SAMBAMBA=/usr/bin/sambamba
+PanSVScope mapr --id=sample01 --genome=hg38.fa --r1=sample01_R1.fq.gz --r2=sample01_R2.fq.gz --outdir=./bams --tmpdir=./tmp --threads=32 --bwa=/usr/bin/bwa --sambamba=/usr/bin/sambamba
 ```
 - Using minibwa (the `--GENOME` is the index prefix):
 ```bash
-PanSVScope mapr --ID=sample01 --GENOME=hg38.fa --R1=sample01_R1.fq.gz --R2=sample01_R2.fq.gz --OUTDIR=./bams --TMPDIR=./tmp --THREADS=32 --Minibwa=/usr/bin/minibwa --SAMBAMBA=/usr/bin/sambamba
+PanSVScope mapr --id=sample01 --genome=hg38.fa --r1=sample01_R1.fq.gz --r2=sample01_R2.fq.gz --outdir=./bams --tmpdir=./tmp --threads=32 --minibwa=/usr/bin/minibwa --sambamba=/usr/bin/sambamba
 ```
 
 ### `PanSVScope svcall`

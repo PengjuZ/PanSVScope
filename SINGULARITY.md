@@ -161,6 +161,7 @@ container's `--cleanenv` flag.
 | `KNOWN_SV`               | Known‑SV database file                               |
 | `PGENOME_VCF`            | Pan‑genome VCF file                                  |
 | `VCF_LIST`               | File listing per‑sample VCFs for `svmer`             |
+| `MANTA_MEM`              | Memory cap (GB) for Manta in `svcall` (optional)     |
 | `SLURM_CPUS_PER_TASK`    | Number of CPUs allocated by SLURM (auto‑set by SLURM)|
 | `DIR_*`                  | Host directories that must be bind‑mounted           |
 
@@ -190,6 +191,10 @@ export SVOUT_LIST=${DIR_svcall}/svout_list.txt
 export KNOWN_SV=${DIR_known_sv}/known_sv.txt
 export PGENOME_VCF=${DIR_pgenome}/pangenome.vcf.gz
 export VCF_LIST=${DIR_vcf_list}/vcf_list.txt
+
+# Optional: cap Manta memory in svcall. Recommended on memory-constrained
+# nodes (e.g., 14 on a 16 GB server). Leave unset to let Manta auto-detect.
+# export MANTA_MEM=14
 ```
 
 > **Note:** In a SLURM batch script, `SLURM_CPUS_PER_TASK` is set automatically
@@ -238,6 +243,7 @@ singularity exec --cleanenv \
   --genome="${REF_FASTA}" \
   --outdir="${DIR_out}" \
   --threads="${SLURM_CPUS_PER_TASK}" \
+  --manta-mem="${MANTA_MEM:-14}" \
   --clean-temp \
   --manta=/opt/envs/legacy/bin/configManta.py \
   --Pythonformanta=/opt/envs/legacy/bin/python \
@@ -257,6 +263,13 @@ singularity exec --cleanenv \
 > The `--env PREPEND_PATH=/opt/envs/legacy/bin` flag makes the legacy Python
 > 2.7 environment visible first on `PATH`, which is needed by Manta and
 > Smoove.
+>
+> `--manta-mem` caps Manta's memory in GB (forwarded to Manta's
+> `runWorkflow.py` as `-g`), while `--threads` is forwarded as `-j`. The
+> example uses `${MANTA_MEM:-14}`, i.e. 14 GB when `MANTA_MEM` is unset —
+> suitable for a 16 GB node. On larger nodes, export `MANTA_MEM` to a larger
+> value (or omit `--manta-mem` entirely to let Manta auto-detect the node
+> memory).
 
 ---
 
@@ -398,6 +411,13 @@ export KNOWN_SV=${DIR_known_sv}/known_sv.txt
 export PGENOME_VCF=${DIR_pgenome}/pangenome.vcf.gz
 export VCF_LIST=${DIR_vcf_list}/vcf_list.txt
 
+# ---- Manta memory cap (GB) ----------------------------------------------
+# Manta's memory usage is capped with --manta-mem (forwarded as -g to
+# runWorkflow.py). The value below is conservative for a 16 GB node; on a
+# larger node (e.g. --mem=128G as in this template) you may increase it or
+# unset it entirely to let Manta auto-detect.
+export MANTA_MEM=14
+
 mkdir -p "${DIR_bam}" "${DIR_tmp}" "${DIR_svcall}" "${DIR_out}"
 
 # ---- Module 1: mapr -----------------------------------------------------
@@ -426,6 +446,7 @@ singularity exec --cleanenv \
     --genome="${REF_FASTA}" \
     --outdir="${DIR_svcall}" \
     --threads="${SLURM_CPUS_PER_TASK}" \
+    --manta-mem="${MANTA_MEM}" \
     --clean-temp \
     --manta=/opt/envs/legacy/bin/configManta.py \
     --Pythonformanta=/opt/envs/legacy/bin/python \
@@ -504,6 +525,10 @@ echo "All modules completed."
 
 - `--cpus-per-task` determines the value of `${SLURM_CPUS_PER_TASK}`, which is
   passed to PanSVScope via `--threads`.
+- `MANTA_MEM` controls the Manta memory cap in `svcall`. The template sets it
+  to `14` (GB), which is safe on a 16 GB node; on larger nodes you can raise
+  it or unset `--manta-mem` to let Manta auto-detect. `--threads` is forwarded
+  to Manta's `runWorkflow.py` as `-j`, and `--manta-mem` as `-g`.
 - If a module exhausts memory, either increase `--mem`, or enable PanSVScope's
   resume feature (`svgeno`) and rerun the job — completed tools will be
   skipped.
@@ -548,6 +573,15 @@ container.
 These tools require **Python 2.7**. Make sure you pass
 `--env PREPEND_PATH=/opt/envs/legacy/bin` and use
 `--Pythonformanta=/opt/envs/legacy/bin/python`.
+
+### Manta is killed by the OOM killer during `svcall`
+
+Manta auto-detects the node memory when `--manta-mem` is not provided. On a
+memory-constrained node (e.g., 16 GB), this can leave too little headroom for
+the OS and other processes, and the kernel may kill Manta. Pass
+`--manta-mem=N` to cap Manta's memory (forwarded as `-g` to Manta's
+`runWorkflow.py`). On a 16 GB node, `--manta-mem=14` is a good starting
+point. `--threads` is forwarded as `-j`.
 
 ### Out‑of‑memory during `svgeno`
 

@@ -217,6 +217,21 @@ PanSVScope svcall \
 
 Output: `./sv_calls/sample01.SVout.txt` (consolidated SV calls) and `./sv_calls/sample01.SVcall.log`.
 
+> **Memory-constrained nodes (e.g., 16 GB RAM):** add `--manta-mem=14` to cap the Manta workflow's memory usage. `--threads` is passed to Manta's `runWorkflow.py` as `-j`, and `--manta-mem` is passed as `-g`. Without `--manta-mem`, Manta auto-detects the node memory, which may leave too little headroom on a 16 GB server and trigger the OOM killer.
+>
+> ```bash
+> PanSVScope svcall \
+>   --id=sample01 \
+>   --bam=./bams/sample01.bam \
+>   --genome=hg38.fa \
+>   --outdir=./sv_calls \
+>   --threads=8 \
+>   --manta-mem=14 \
+>   --manta=/usr/bin/configManta.py \
+>   --Pythonformanta=/usr/bin/python2 \
+>   --survivor=/usr/local/bin/SURVIVOR
+> ```
+
 ### 3. Build a pan‑genome graph from multiple SV sources (pangra)
 
 First create a file `wgs_sv_list.txt` listing all `.SVout.txt` files (one per sample):
@@ -359,7 +374,8 @@ Ensemble SV calling using multiple tools.
 | `--bam` | Input BAM file (sorted and ".bai" indexed) (required) |
 | `--genome` | Reference genome FASTA (required) |
 | `--outdir` | Output directory (required) |
-| `--threads` | Number of CPU threads [default: 1] |
+| `--threads` | Number of CPU threads [default: 1]. Also passed to Manta's `runWorkflow.py` as `-j`. |
+| `--manta-mem` | Memory limit for the Manta workflow in GB, passed to Manta's `runWorkflow.py` as `-g`. Recommended on memory-constrained nodes (e.g., `14` on a 16 GB server). If omitted, Manta auto-detects the node memory. [optional] |
 | `--clean-temp` | Remove tool‑specific temporary directories after completion |
 | `--manta` | Path to Manta configuration script (e.g., `configManta.py`) |
 | `--Pythonformanta` | Python interpreter for Manta (e.g., `python2`) |
@@ -511,7 +527,8 @@ Output: `{workdir}/SVgeno.vcf.gz` – a VCF with genotype columns for all sample
 6. **Memory and disk space**  
    - `mapr` sorting uses 16 GB per thread (configurable via Sambamba’s `-m` parameter in the code).  
    - `pangra` phases may create large intermediate files; ensure `TMPDIR` or the working directory has sufficient free space (at least 2× the size of input FASTQ files).  
-   - `svgeno` runs multiple tools sequentially; each tool may use substantial memory (e.g., VG‑Giraffe >32 GB for human genomes).
+   - `svgeno` runs multiple tools sequentially; each tool may use substantial memory (e.g., VG‑Giraffe >32 GB for human genomes).  
+   - **`svcall` on memory-constrained nodes:** Manta’s memory usage can be capped with `--manta-mem` (GB). This value is forwarded to Manta’s `runWorkflow.py` as `-g`, and `--threads` is forwarded as `-j`. On a 16 GB server, `--manta-mem=14` is recommended to leave headroom for the OS and other processes. Without `--manta-mem`, Manta auto-detects node memory, which may be too aggressive on small nodes.
 
 7. **Running phases independently**  
    `pangra` allows re‑running individual phases with the `--phase` option, which is useful for debugging or when only part of the pipeline needs to be updated.

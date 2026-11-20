@@ -268,6 +268,8 @@ PanSVScope pangra \
 
 Outputs: `./pangraph_results/SVsets.Merge.vcf.gz` (integrated SV set), `./pangraph_results/Index/` (graph indexes for VG‑Giraffe and PanGenie).
 
+> **`--known-sv` format:** a headerless, tab‑delimited file with four columns `chrom  start  ref  alt` (plain `.txt` or `.txt.gz`). See [Known SV input format](#known-sv-input-format-known-sv) in the Command Reference for the full specification and examples. If you are unsure whether your own file is usable, pre‑check it with the bundled **CheckSV** tool (see the note in the same subsection).
+
 ### 4. Genotype a sample using the built graph (svgeno)
 
 ```bash
@@ -418,7 +420,53 @@ Integrate SVs from multiple sources and build a variation graph.
 | `--tabix` | Path to tabix (required) |
 | `--help` | Show help message |
 
-At least one SV source (`--sv-out-list`, `--known-sv` or `--pgenome`) must be provided. The five phases are:
+At least one SV source (`--sv-out-list`, `--known-sv` or `--pgenome`) must be provided.
+
+#### Known SV input format (`--known-sv`)
+
+`--known-sv` accepts a **tab‑delimited, headerless** text file (plain `.txt` or gzip‑compressed `.txt.gz`) with **four columns**:
+
+| Column | Name | Description |
+|--------|------|-------------|
+| 1 | `chrom` | Chromosome / contig name, must match the reference FASTA and BAM (e.g. `chr1` vs `1`) |
+| 2 | `start` | 1‑based start position of the variant (same coordinate convention as the VCF `POS` field) |
+| 3 | `ref` | Reference allele sequence (uppercase A/C/G/T) |
+| 4 | `alt` | Alternate allele sequence (uppercase A/C/G/T) |
+
+Both deletions (REF longer than ALT) and insertions (ALT longer than REF) are supported, as well as substitutions/block replacements (REF and ALT of equal length). One variant per line, no header line.
+
+Example:
+
+```
+chr1	112140	CTGATCATGCACTGATCACGTACATGATCATGCACTGATCATTTGGCTGATCATACACTG	C
+chr1	113730	A	ACACACTGATCACTTGGATGATCATACCCCTATCACGTGACTGATCATGTTAATGCACTGATCACGTGGCTGATCATGCACTGATCACGTGGCTGATCATGCACTGAT
+```
+
+In this example, line 1 is a **deletion** (long REF, single‑base ALT) and line 2 is an **insertion** (single‑base REF, long ALT).
+
+Notes:
+
+- The `ref` sequence must match the reference genome at `chrom:start`; entries that fail this check are filtered out during pangra phase 3 (Known SV Processing).
+- Chromosome naming must be consistent with `--genome`, the input BAMs and the VCFs used in `--sv-out-list` / `--pgenome` (see Important Notes #5).
+- Coordinates are interpreted as 1‑based; if your source file is BED‑like (0‑based, half‑open), shift `start` by +1 before use.
+- The file may be gzip‑compressed (`.txt.gz`) and will be read directly.
+
+**Validating your `--known-sv` file before running `pangra`:**
+
+If you are not sure whether your own `--known-sv` file is compatible with PanSVScope, you can pre‑check it with **CheckSV**, which is bundled with PanSVScope (see the Bundled Tools table in the Installation section) and is also the same tool that `pangra` calls internally during Known SV Processing (phase 3). Running CheckSV on the file **before** invoking `pangra` lets you catch malformed records, REF‑allele mismatches against the reference, and chromosome‑naming inconsistencies early — avoiding a full pangra re‑run over a single bad line.
+
+```bash
+# Inspect CheckSV's available options
+CheckSV --help
+
+# Illustrative pre-check (exact flags may differ between CheckSV builds;
+# confirm with `CheckSV --help` before running on your data)
+CheckSV -i your_known_sv.txt -r hg38.fa -o check_sv_report
+```
+
+If CheckSV reports problems, fix the corresponding lines in your `--known-sv` file (or convert chromosome names to match the reference) before re‑running `pangra`. Because CheckSV is bundled, it is available wherever PanSVScope itself is installed — no separate installation step is required.
+
+The five phases are:
 
 1. **WGS Processing** – cluster and filter WGS SV calls  
 2. **Pan‑genome Processing** – normalise and split existing VCF  
@@ -555,6 +603,8 @@ Output: `{workdir}/SVgeno.vcf.gz` – a VCF with genotype columns for all sample
 13. **Pre‑built `--known-sv` datasets**  
     For several domestic animals (e.g., cattle, pig, chicken) and human, we provide ready‑to‑use known SV databases that can be directly supplied to the `--known-sv` parameter of `pangra`. These datasets have been curated from public resources (e.g., dbVar, gnomAD‑SV) and are compatible with PanSVScope.  
     ➤ **Download links:** [See our data repository – XXXXA]  
+    ➤ **Input format:** these files follow the 4‑column `chrom  start  ref  alt` specification described in [Known SV input format](#known-sv-input-format-known-sv) under the `pangra` command reference.  
+    ➤ **Self‑prepared files:** if you are bringing your own `--known-sv` file and are unsure whether it is compatible, validate it first with the bundled **CheckSV** tool (see the "Validating your `--known-sv` file" note in the same subsection) before running the full `pangra` pipeline.
 
 14. **Building and using `--pgenome` files**  
     If you wish to construct a custom pan‑genome VCF for your own set of genomes, we recommend using **cactus-pangenome** with the `--vcf` flag to produce a `pangenome.vcf.gz` file. A recommended command for a human‑sized project (adjust cores, memory, and disk as needed) is:

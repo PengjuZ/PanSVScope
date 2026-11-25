@@ -647,6 +647,11 @@ Output: `{workdir}/SVgeno.vcf.gz` – a VCF with genotype columns for all sample
 16. **Resume after failure (`svgeno`)**  
     For memory‑intensive runs — especially with high‑depth WGS data — individual genotyping tools may be terminated by the operating system (e.g., out‑of‑memory kills) while others complete successfully. `svgeno` supports **checkpoint‑based resume**: on re‑running the same command, tools whose output VCFs are already present and valid are skipped, and only the failed tool(s) are re‑executed. The merge step is deferred until **all enabled tools** have produced valid outputs. Add `--force` to bypass this behaviour and rerun every enabled tool from scratch (useful when inputs have changed or when you suspect a previous output is corrupted despite passing validation).
 
+17. **Tracing the source of merged SVs (`SVtrace`)**  
+    If you want to know which input source(s) — `Known`, `PGenome`, or `WGS` — actually support each variant in the final merged set, you can use the bundled **SVtrace** companion utility. It traces every record in `SVsets.Merge.txt` back to its supporting source(s) and labels it with a canonical source string in the fixed order `Known` → `PGenome` → `WGS` (e.g. `Known-PGenome`, `PGenome-WGS`, `Known-PGenome-WGS`; the active label set adapts to the sources supplied).  
+    SVtrace reuses the bundled `markdup` and `minimap2` and reproduces the exact `pangra` Phase 4 merging/cluster‑selection rules, so its labels are fully consistent with `SVsets.Merge.txt`. Run it on the validated Phase 4 files (`SVsets.Known.txt`, `SVsets.PGenome.txt`, `SVsets.WGS.txt`, `SVsets.Merge.txt`) rather than raw pre‑`CheckSV` inputs.  
+    ➤ **Details:** see [**SVTRACE.md**](SVTRACE.md) for the full option reference, tracing rules, and examples.
+
 ## Citation
 
 If you use PanSVScope in a publication, please cite:

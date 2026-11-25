@@ -14,8 +14,6 @@
 - [Tracing & Labeling Rules](#tracing--labeling-rules)
 - [Input & Output File Descriptions](#input--output-file-descriptions)
 - [Important Notes](#important-notes)
-- [Citation](#citation)
-- [License](#license)
 
 ---
 
@@ -40,25 +38,11 @@ SVtrace reuses the exact same `markdup` and `minimap2` executables bundled with 
 
 | Tool | Tested Version | Notes |
 |------|----------------|-------|
-| SVtrace | 1.0.0 | Compiled from `SVtrace.c` |
+| SVtrace | 1.0.0 (bundled with PanSVScope) | Compiled from `SVtrace.c` |
 | markdup | 1.0.0 (bundled with PanSVScope) | Required for Phase 1 (`--markdup`) |
 | minimap2 | 2.30-r1290-dirty (bundled with PanSVScope) | Required for Phase 1 (`--minimap2`) |
 
 > **Note:** `--markdup` and `--minimap2` are only required when Phase 1 is executed (`--phase=all` or `--phase=1`). If you are re‑running only Phase 2 or Phase 3 on existing `tmp/` files, these two options may be omitted.
-
-### Build from source
-
-Compile `SVtrace.c` directly with `gcc` or `clang` (no external libraries needed):
-
-```bash
-gcc -O2 -Wall -o SVtrace SVtrace.c
-```
-
-Verify the binary:
-
-```bash
-./SVtrace --help
-```
 
 ## Quick Start Examples
 
